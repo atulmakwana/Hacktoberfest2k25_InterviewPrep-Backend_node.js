@@ -98,10 +98,14 @@ export const validate = (req, res, next) => {
  */
 
 export const validateRegister = [
-  // TODO: Add validation chains for registration
-  body('name').trim().notEmpty().withMessage('Name is required'),
-  body('email').isEmail().withMessage('Please enter a valid email'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  // TODO: Implement validation for name
+  body('name'), 
+
+  // TODO: Implement validation for email
+  body('email'), 
+
+  // TODO: Implement validation for password
+  body('password'),
 ];
 
 /**
@@ -113,10 +117,13 @@ export const validateRegister = [
  */
 
 export const validateLogin = [
-  // TODO: Add validation chains for login
-  body('email').isEmail().withMessage('Please enter a valid email'),
-  body('password').notEmpty().withMessage('Password is required'),
+  // TODO: Implement validation for email
+  body('email'),
+
+  // TODO: Implement validation for password
+  body('password'),
 ];
+
 
 /**
  * TODO: CREATE VALIDATION CHAINS FOR QUESTION CREATION
@@ -140,18 +147,22 @@ export const validateLogin = [
  */
 
 export const validateCreateQuestion = [
-  // TODO: Add validation chains for question creation
-  body('questionText')
-    .trim()
-    .notEmpty()
-    .withMessage('Question text is required')
-    .isLength({ min: 10 })
-    .withMessage('Question must be at least 10 characters'),
-  body('company').trim().notEmpty().withMessage('Company is required'),
-  body('topic').trim().notEmpty().withMessage('Topic is required'),
-  body('role').trim().notEmpty().withMessage('Role is required'),
-  body('difficulty').isIn(['Easy', 'Medium', 'Hard']).withMessage('Difficulty must be Easy, Medium, or Hard'),
+  // TODO: Implement validation for questionText
+  body('questionText'),
+
+  // TODO: Implement validation for company
+  body('company'),
+
+  // TODO: Implement validation for topic
+  body('topic'),
+
+  // TODO: Implement validation for role
+  body('role'),
+
+  // TODO: Implement validation for difficulty
+  body('difficulty'),
 ];
+
 
 /**
  * TODO: CREATE VALIDATION CHAINS FOR QUESTION UPDATE
@@ -161,14 +172,16 @@ export const validateCreateQuestion = [
  */
 
 export const validateUpdateQuestion = [
-  // TODO: Add validation chains for question update
-  body('questionText').optional().trim().isLength({ min: 10 }).withMessage('Question must be at least 10 characters'),
-  body('topic').optional().trim().notEmpty().withMessage('Topic cannot be empty'),
-  body('difficulty')
-    .optional()
-    .isIn(['Easy', 'Medium', 'Hard'])
-    .withMessage('Difficulty must be Easy, Medium, or Hard'),
+  // TODO: Implement optional validation for questionText
+  body('questionText').optional(),
+
+  // TODO: Implement optional validation for topic
+  body('topic').optional(),
+
+  // TODO: Implement optional validation for difficulty
+  body('difficulty').optional(),
 ];
+
 
 /**
  * TODO: CREATE VALIDATION FOR MONGODB OBJECTID
@@ -182,8 +195,8 @@ export const validateUpdateQuestion = [
  */
 
 export const validateObjectId = [
-  // TODO: Add ObjectId validation
-  param('id').isMongoId().withMessage('Invalid ID format'),
+  // TODO: Implement ObjectId validation
+  param('id'),
 ];
 
 /**
@@ -198,9 +211,15 @@ export const validateObjectId = [
  */
 
 export const validateQueryParams = [
-  // TODO: Add query parameter validations
-  query('sort').optional().isIn(['latest', 'oldest', 'upvotes']).withMessage('Invalid sort parameter'),
-  query('difficulty').optional().isIn(['Easy', 'Medium', 'Hard']).withMessage('Invalid difficulty'),
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  // TODO: Implement validation for sort query
+  query('sort').optional(),
+
+  // TODO: Implement validation for difficulty query
+  query('difficulty').optional(),
+
+  // TODO: Implement validation for page query
+  query('page').optional(),
+
+  // TODO: Implement validation for limit query
+  query('limit').optional(),
 ];
