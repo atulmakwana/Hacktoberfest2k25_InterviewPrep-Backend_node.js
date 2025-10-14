@@ -773,8 +773,8 @@ kill -9 <PID>
 
 ## Related Repositories
 
-- **Frontend Repository:** [Link to frontend repo]
-- **Documentation:** [Link to docs if separate]
+- **Frontend Repository:** [Frontend Repo](https://github.com/MSTC-DA-IICT/Hacktoberfest2k25_React.js)
+- **Documentation for Endpoints[API Routes]:** [Docs](https://docs.google.com/document/d/14AyAqyu26qKM8LX28oWZee304NahW7DJWeGDLIGZw3Y/edit?usp=sharing)
 
 ## Resources
 
