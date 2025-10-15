@@ -83,12 +83,19 @@ const questionSchema = new mongoose.Schema(
 );
 
 /**
- * TODO: ADD INDEXES FOR QUERY OPTIMIZATION
- *
- * Add indexes on frequently queried fields to improve performance
- * Example: company, topic, role, difficulty, compound indexes
+ * Database Indexes for Query Optimization
  */
-// questionSchema.index({ /* TODO */ });
+
+// Single-field indexes for filtering
+questionSchema.index({ company: 1 });
+questionSchema.index({ topic: 1 });
+questionSchema.index({ difficulty: 1 });
+
+// Text index for search functionality
+questionSchema.index({ questionText: 'text' });
+
+// Compound index for common filter combinations
+questionSchema.index({ company: 1, topic: 1, role: 1 });
 
 /**
  * Instance Method: addUpvote
