@@ -126,48 +126,53 @@ export const createQuestion = async (req, res, next) => {
 
 export const getAllQuestions = async (req, res, next) => {
   try {
-    // TODO: Implement get all questions with filters
-
     // Extract query parameters
     const { company, topic, role, difficulty, sort, fromDate, toDate, page = 1, limit = 10 } = req.query;
 
-    // Build filter object
+    // Build filter object based on query parameters
     const filter = {};
-    // if (company) filter.company = company;
-    // if (topic) filter.topic = topic;
-    // if (role) filter.role = role;
-    // if (difficulty) filter.difficulty = difficulty;
+    if (company) filter.company = company;
+    if (topic) filter.topic = topic;
+    if (role) filter.role = role;
+    if (difficulty) filter.difficulty = difficulty;
 
-    // Date range filtering
-    // if (fromDate || toDate) {
-    //   filter.createdAt = {};
-    //   if (fromDate) filter.createdAt.$gte = new Date(fromDate);
-    //   if (toDate) filter.createdAt.$lte = new Date(toDate);
-    // }
+    // Handle date range filtering on createdAt field
+    if (fromDate || toDate) {
+      filter.createdAt = {};
+      if (fromDate) filter.createdAt.$gte = new Date(fromDate);
+      if (toDate) filter.createdAt.$lte = new Date(toDate);
+    }
 
-    // Build sort object
-    // let sortOption = {};
-    // if (sort === 'latest') sortOption = { createdAt: -1 };
-    // else if (sort === 'oldest') sortOption = { createdAt: 1 };
-    // else if (sort === 'upvotes') sortOption = { upvotes: -1 };
-    // else sortOption = { createdAt: -1 }; // default
+    // Build sort object based on sort parameter
+    let sortOption = {};
+    if (sort === 'latest') sortOption = { createdAt: -1 };
+    else if (sort === 'oldest') sortOption = { createdAt: 1 };
+    else if (sort === 'upvotes') sortOption = { upvotes: -1 };
+    else sortOption = { createdAt: -1 }; // default to latest
 
-    // Pagination
-    // const skip = (page - 1) * limit;
+    // Calculate pagination values
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
 
-    // Execute query
-    // const questions = await Question.find(filter)
-    //   .sort(sortOption)
-    //   .skip(skip)
-    //   .limit(parseInt(limit))
-    //   .populate('submittedBy', 'name');
+    // Execute query with filtering, sorting, and pagination
+    const questions = await Question.find(filter)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNum)
+      .populate('submittedBy', 'name');
 
-    // Get total count
-    // const total = await Question.countDocuments(filter);
+    // Get total count for pagination metadata
+    const total = await Question.countDocuments(filter);
+    const totalPages = Math.ceil(total / limitNum);
 
-    res.status(501).json({
-      success: false,
-      message: 'Get questions endpoint not implemented yet',
+    // Return response with pagination metadata
+    res.status(200).json({
+      success: true,
+      count: total,
+      page: pageNum,
+      pages: totalPages,
+      data: questions
     });
   } catch (error) {
     next(error);
