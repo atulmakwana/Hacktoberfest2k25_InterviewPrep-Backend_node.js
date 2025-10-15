@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * SERVER.JS - Main Entry Point for Backend
  *
@@ -23,7 +24,7 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+// import cors from 'cors';
 
 // TODO: Import database connection
 import connectDB from './config/database.js';
@@ -33,7 +34,8 @@ import connectDB from './config/database.js';
 // import questionRoutes from './routes/questionRoutes.js';
 
 // TODO: Import error middleware
-// import { errorHandler } from './middleware/errorMiddleware.js';
+// const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+import { errorHandler,notFound } from './middleware/errorMiddleware.js';
 
 // Load environment variables
 dotenv.config();
@@ -58,16 +60,6 @@ const PORT = process.env.PORT || 5000;
  * BONUS: Configure CORS to only allow requests from FRONTEND_URL
  */
 
-/**
- * TODO: MOUNT API ROUTES
- * Mount your route handlers here:
- * - app.use('/api/auth', authRoutes);
- * - app.use('/api/questions', questionRoutes);
- * - app.use('/api/categories', categoryRoutes);
- *
- * Remember: All routes should be prefixed with /api
- */
-
 // Test route - Remove this after implementing proper routes
 app.get('/api/test', (req, res) => {
   res.json({
@@ -78,10 +70,37 @@ app.get('/api/test', (req, res) => {
 });
 
 /**
+ * TODO: MOUNT API ROUTES
+ * Mount your route handlers here:
+ * - app.use('/api/auth', authRoutes);
+ * - app.use('/api/questions', questionRoutes);
+ * - app.use('/api/categories', categoryRoutes);
+ *
+ * Remember: All routes should be prefixed with /api
+ */
+
+
+
+//404 Handler - AFTER all routes
+app.use(notFound);
+
+
+/**
  * TODO: ADD ERROR HANDLING MIDDLEWARE
  * This should be the LAST middleware
  * Example: app.use(errorHandler);
  */
+
+app.use(errorHandler);
+
+
+// ⬇️ TEMPORARY TEST ROUTE - This should NEVER be reached!
+app.get('/api/debug-test', (req, res) => {
+  res.json({ 
+    message: 'THIS SHOULD NOT APPEAR! Error handlers are too early!' 
+  });
+});
+
 
 /**
  * TODO: START SERVER
