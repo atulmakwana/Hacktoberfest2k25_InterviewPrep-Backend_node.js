@@ -178,13 +178,6 @@ export const getAllQuestions = async (req, res, next) => {
  * @route   GET /api/questions/:id
  * @desc    Get a single question by ID
  * @access  Public
- *
- * Steps:
- * 1. Extract id from req.params
- * 2. Find question using Question.findById()
- * 3. Optionally populate submittedBy field
- * 4. If not found, return 404 error
- * 5. Return question data
  */
 
 export const getQuestionById = async (req, res, next) => {
@@ -370,94 +363,65 @@ export const getQuestionUpvotes = async (req, res, next) => {
   }
 };
 
-/**
- * TODO: IMPLEMENT SEARCH QUESTIONS
- *
+/*
  * @route   GET /api/questions/search?q=keyword
  * @desc    Search questions by keyword in questionText, company, or topic
  * @access  Public
- *
- * Steps:
- * 1. Extract 'q' query parameter (search keyword)
- * 2. Build regex search query for questionText, company, and topic
- * 3. Use $or operator to search across multiple fields
- * 4. Return matching questions
- *
- * EXAMPLE:
- * const searchRegex = new RegExp(keyword, 'i'); // case-insensitive
- * const questions = await Question.find({
- *   $or: [
- *     { questionText: searchRegex },
- *     { company: searchRegex },
- *     { topic: searchRegex }
- *   ]
- * });
  */
 
 export const searchQuestions = async (req, res, next) => {
   try {
-    // TODO: Implement search functionality
-
     const { q } = req.query;
 
-    // if (!q) return 400 error
+    if (!q || q.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: "Search query is required"
+      });
+    }
 
-    // Build regex search
-    // const searchRegex = new RegExp(q, 'i');
+    // Build case-insensitive regex
+    const searchRegex = new RegExp(q, 'i');
 
     // Search across multiple fields
-    // const questions = await Question.find({
-    //   $or: [
-    //     { questionText: searchRegex },
-    //     { company: searchRegex },
-    //     { topic: searchRegex }
-    //   ]
-    // }).sort({ createdAt: -1 });
+    const questions = await Question.find({
+      $or: [
+        { questionText: searchRegex },
+        { company: searchRegex },
+        { topic: searchRegex }
+      ]
+    }).sort({ createdAt: -1 });
 
-    res.status(501).json({
-      success: false,
-      message: 'Search endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      message: questions.length ? "Questions fetched successfully" : "No questions found",
+      count: questions.length,
+      questions
     });
+
   } catch (error) {
     next(error);
   }
 };
 
-/**
- * TODO: IMPLEMENT GET CATEGORIES
- *
+/*
  * @route   GET /api/categories
  * @desc    Get list of all unique topics and companies
  * @access  Public
- *
- * Steps:
- * 1. Use Question.distinct() to get unique values
- * 2. Get distinct topics: Question.distinct('topic')
- * 3. Get distinct companies: Question.distinct('company')
- * 4. Get distinct roles: Question.distinct('role')
- * 5. Return all three arrays
- *
- * RESPONSE:
- * {
- *   success: true,
- *   topics: ['Arrays', 'Graphs', 'System Design', ...],
- *   companies: ['Google', 'Amazon', 'Microsoft', ...],
- *   roles: ['SDE', 'Analyst', 'Frontend', ...]
- * }
  */
 
 export const getCategories = async (req, res, next) => {
   try {
-    // TODO: Implement get categories
+    // Get distinct values from the Question collection
+    const topics = await Question.distinct('topic');
+    const companies = await Question.distinct('company');
+    const roles = await Question.distinct('role');
 
-    // Get distinct values
-    // const topics = await Question.distinct('topic');
-    // const companies = await Question.distinct('company');
-    // const roles = await Question.distinct('role');
-
-    res.status(501).json({
-      success: false,
-      message: 'Get categories endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      topics,
+      companies,
+      roles
     });
   } catch (error) {
     next(error);
