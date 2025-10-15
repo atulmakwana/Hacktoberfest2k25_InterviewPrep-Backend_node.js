@@ -37,23 +37,29 @@ const questionSchema = new mongoose.Schema(
   {
     questionText: {
       type: String,
-      // TODO: Add required, trim, and minlength validations
+      required: true,
+      trim: true,
+      minlength: 10
     },
     company: {
       type: String,
-      // TODO: Add required and trim
+      required: true,
+      trim: true
     },
     topic: {
       type: String,
-      // TODO: Add required and trim
+      required: true,
+      trim: true
     },
     role: {
       type: String,
-      // TODO: Add required and trim
+      required: true,
+      trim: true
     },
     difficulty: {
       type: String,
-      // TODO: Add required and enum ['Easy', 'Medium', 'Hard']
+      required: true,
+      enum: ['Easy', 'Medium', 'Hard']
     },
     submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -63,7 +69,7 @@ const questionSchema = new mongoose.Schema(
     upvotes: {
       type: Number,
       default: 0,
-      // TODO: Add min 0 validation
+      min: 0
     },
     upvotedBy: {
       type: [mongoose.Schema.Types.ObjectId],
@@ -72,7 +78,7 @@ const questionSchema = new mongoose.Schema(
     },
   },
   {
-    // TODO: Enable timestamps
+    timestamps: true
   }
 );
 
