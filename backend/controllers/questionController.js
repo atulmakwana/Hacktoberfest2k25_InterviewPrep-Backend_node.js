@@ -62,23 +62,23 @@ import Question from '../models/Question.js';
 
 export const createQuestion = async (req, res, next) => {
   try {
-    // TODO: Implement create question logic
-
+    // Extract required fields from request body
     const { questionText, company, topic, role, difficulty } = req.body;
 
-    // Create question with submittedBy field (optional for anonymous)
-    // const question = await Question.create({
-    //   questionText,
-    //   company,
-    //   topic,
-    //   role,
-    //   difficulty,
-    //   submittedBy: req.user ? req.user.id : null
-    // });
+    // Create question with submittedBy field from authenticated user
+    const question = await Question.create({
+      questionText,
+      company,
+      topic,
+      role,
+      difficulty,
+      submittedBy: req.user.id
+    });
 
-    res.status(501).json({
-      success: false,
-      message: 'Create question endpoint not implemented yet',
+    res.status(201).json({
+      success: true,
+      message: "Question created successfully",
+      data: question
     });
   } catch (error) {
     next(error);
