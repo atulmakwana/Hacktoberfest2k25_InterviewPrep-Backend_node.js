@@ -91,18 +91,27 @@ const questionSchema = new mongoose.Schema(
 // questionSchema.index({ /* TODO */ });
 
 /**
- * TODO: ADD INSTANCE METHOD - addUpvote
- *
- * This method should toggle upvote by a given userId
- * Steps:
- * 1. Check if user already upvoted
- * 2. If yes: remove upvote
- * 3. If no: add upvote
- * 4. Save and return updated question
+ * Instance Method: addUpvote
+ * Toggle upvote functionality for a question by userId
  */
-// questionSchema.methods.addUpvote = async function(userId) {
-//   // TODO: Implement upvote toggle logic
-// };
+questionSchema.methods.addUpvote = async function(userId) {
+  // Check if user already upvoted this question
+  const userIndex = this.upvotedBy.indexOf(userId);
+  
+  if (userIndex > -1) {
+    // User already upvoted - remove upvote
+    this.upvotedBy.splice(userIndex, 1);
+    this.upvotes -= 1;
+  } else {
+    // User hasn't upvoted - add upvote
+    this.upvotedBy.push(userId);
+    this.upvotes += 1;
+  }
+  
+  // Save the updated document
+  const updatedQuestion = await this.save();
+  return updatedQuestion;
+};
 
 /**
  * TODO: CREATE AND EXPORT QUESTION MODEL
