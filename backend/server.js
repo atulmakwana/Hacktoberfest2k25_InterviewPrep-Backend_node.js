@@ -33,7 +33,8 @@ import cors from 'cors';
 // import questionRoutes from './routes/questionRoutes.js';
 
 // TODO: Import error middleware
-// import { errorHandler } from './middleware/errorMiddleware.js';
+// const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+import { errorHandler,notFound } from './middleware/errorMiddleware.js';
 
 // Load environment variables
 dotenv.config();
@@ -76,11 +77,18 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+
+//404 Handler - AFTER all routes
+app.use(notFound);
+
+
 /**
  * TODO: ADD ERROR HANDLING MIDDLEWARE
  * This should be the LAST middleware
  * Example: app.use(errorHandler);
  */
+
+app.use(errorHandler);
 
 /**
  * TODO: START SERVER
