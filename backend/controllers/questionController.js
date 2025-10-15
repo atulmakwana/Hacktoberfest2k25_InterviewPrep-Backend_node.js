@@ -174,9 +174,7 @@ export const getAllQuestions = async (req, res, next) => {
   }
 };
 
-/**
- * TODO: IMPLEMENT GET QUESTION BY ID
- *
+/*
  * @route   GET /api/questions/:id
  * @desc    Get a single question by ID
  * @access  Public
@@ -191,27 +189,29 @@ export const getAllQuestions = async (req, res, next) => {
 
 export const getQuestionById = async (req, res, next) => {
   try {
-    // TODO: Implement get question by ID
-
     const { id } = req.params;
 
-    // const question = await Question.findById(id).populate('submittedBy', 'name email');
+    // Find question and populate submittedBy
+    const question = await Question.findById(id).populate('submittedBy', 'name'); 
 
-    // if (!question) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: 'Question not found'
-    //   });
-    // }
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found'
+      });
+    }
 
-    res.status(501).json({
-      success: false,
-      message: 'Get question by ID endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      message: 'Question fetched successfully',
+      question
     });
+
   } catch (error) {
     next(error);
   }
 };
+
 
 /**
  * TODO: IMPLEMENT UPDATE QUESTION
@@ -342,36 +342,28 @@ export const upvoteQuestion = async (req, res, next) => {
   }
 };
 
-/**
- * TODO: IMPLEMENT GET QUESTION UPVOTES
- *
+/*
  * @route   GET /api/questions/:id/upvotes
  * @desc    Get total upvotes for a question
  * @access  Public
- *
- * Steps:
- * 1. Find question by ID
- * 2. Return upvotes count
- *
- * RESPONSE:
- * {
- *   success: true,
- *   upvotes: 42
- * }
  */
 
 export const getQuestionUpvotes = async (req, res, next) => {
   try {
-    // TODO: Implement get upvotes
-
     const { id } = req.params;
 
-    // const question = await Question.findById(id);
-    // if (!question) return 404
+    const question = await Question.findById(id);
+    if(!question){
+      return res.status(404).json({
+        success: false,
+        message: "Question not found"
+      });
+    }
 
-    res.status(501).json({
-      success: false,
-      message: 'Get upvotes endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      message: 'Upvotes fetched successfully',
+      upvotes: question.upvotes 
     });
   } catch (error) {
     next(error);
