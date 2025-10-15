@@ -75,53 +75,29 @@ export const validate = (req, res, next) => {
   next();
 };
 
-/**
- * TODO: CREATE VALIDATION CHAINS FOR USER REGISTRATION
- *
- * Validate:
- * - name: required, not empty, trimmed, min 2 characters
- * - email: required, valid email format, normalized
- * - password: required, min 6 characters
- *
- * EXAMPLE:
- * export const validateRegister = [
- *   body('name')
- *     .trim()
- *     .notEmpty().withMessage('Name is required')
- *     .isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
- *   body('email')
- *     .isEmail().withMessage('Please enter a valid email')
- *     .normalizeEmail(),
- *   body('password')
- *     .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
- * ];
- */
 
 export const validateRegister = [
-  // TODO: Implement validation for name
-  body('name'), 
+  body('name')
+    .trim()
+    .notEmpty().withMessage('Name is required')
+    .isLength({ min: 2 }).withMessage('Name must be at least 2 characters'), 
 
-  // TODO: Implement validation for email
-  body('email'), 
+  body('email')
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Please enter a valid email'), 
 
-  // TODO: Implement validation for password
-  body('password'),
+  body('password')
+    .notEmpty().withMessage('Password is required')
+    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ];
 
-/**
- * TODO: CREATE VALIDATION CHAINS FOR USER LOGIN
- *
- * Validate:
- * - email: required, valid email format
- * - password: required, not empty
- */
-
 export const validateLogin = [
-  // TODO: Implement validation for email
-  body('email'),
+  body('email')
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Please enter a valid email'),
 
-  // TODO: Implement validation for password
-  body('password'),
+  body('password')
+    .notEmpty().withMessage('Password is required'),
 ];
 
 
