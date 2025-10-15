@@ -37,23 +37,29 @@ const questionSchema = new mongoose.Schema(
   {
     questionText: {
       type: String,
-      // TODO: Add required, trim, and minlength validations
+      required: true,
+      trim: true,
+      minlength: 10
     },
     company: {
       type: String,
-      // TODO: Add required and trim
+      required: true,
+      trim: true
     },
     topic: {
       type: String,
-      // TODO: Add required and trim
+      required: true,
+      trim: true
     },
     role: {
       type: String,
-      // TODO: Add required and trim
+      required: true,
+      trim: true
     },
     difficulty: {
       type: String,
-      // TODO: Add required and enum ['Easy', 'Medium', 'Hard']
+      required: true,
+      enum: ['Easy', 'Medium', 'Hard']
     },
     submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -63,7 +69,7 @@ const questionSchema = new mongoose.Schema(
     upvotes: {
       type: Number,
       default: 0,
-      // TODO: Add min 0 validation
+      min: 0
     },
     upvotedBy: {
       type: [mongoose.Schema.Types.ObjectId],
@@ -72,31 +78,47 @@ const questionSchema = new mongoose.Schema(
     },
   },
   {
-    // TODO: Enable timestamps
+    timestamps: true
   }
 );
 
 /**
- * TODO: ADD INDEXES FOR QUERY OPTIMIZATION
- *
- * Add indexes on frequently queried fields to improve performance
- * Example: company, topic, role, difficulty, compound indexes
+ * Database Indexes for Query Optimization
  */
-// questionSchema.index({ /* TODO */ });
+
+// Single-field indexes for filtering
+questionSchema.index({ company: 1 });
+questionSchema.index({ topic: 1 });
+questionSchema.index({ difficulty: 1 });
+
+// Text index for search functionality
+questionSchema.index({ questionText: 'text' });
+
+// Compound index for common filter combinations
+questionSchema.index({ company: 1, topic: 1, role: 1 });
 
 /**
- * TODO: ADD INSTANCE METHOD - addUpvote
- *
- * This method should toggle upvote by a given userId
- * Steps:
- * 1. Check if user already upvoted
- * 2. If yes: remove upvote
- * 3. If no: add upvote
- * 4. Save and return updated question
+ * Instance Method: addUpvote
+ * Toggle upvote functionality for a question by userId
  */
-// questionSchema.methods.addUpvote = async function(userId) {
-//   // TODO: Implement upvote toggle logic
-// };
+questionSchema.methods.addUpvote = async function(userId) {
+  // Check if user already upvoted this question
+  const userIndex = this.upvotedBy.indexOf(userId);
+  
+  if (userIndex > -1) {
+    // User already upvoted - remove upvote
+    this.upvotedBy.splice(userIndex, 1);
+    this.upvotes -= 1;
+  } else {
+    // User hasn't upvoted - add upvote
+    this.upvotedBy.push(userId);
+    this.upvotes += 1;
+  }
+  
+  // Save the updated document
+  const updatedQuestion = await this.save();
+  return updatedQuestion;
+};
 
 /**
  * TODO: CREATE AND EXPORT QUESTION MODEL
