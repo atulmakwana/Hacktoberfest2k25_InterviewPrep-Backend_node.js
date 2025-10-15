@@ -49,9 +49,17 @@ import mongoose from 'mongoose';
  */
 
 const connectDB = async () => {
-  // TODO: Implement MongoDB connection logic here
-  console.log('⚠️ Database connection not implemented yet!');
-  console.log('👉 Implement this in config/database.js');
+  try {
+    // Connect to MongoDB using Mongoose
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+
+    // Log successful connection
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    // Log error message and exit process
+    console.error(`❌ Error: ${error.message}`);
+    process.exit(1);
+  }
 };
 
 export default connectDB;

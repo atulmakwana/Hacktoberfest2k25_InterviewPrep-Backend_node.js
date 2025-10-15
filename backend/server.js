@@ -27,7 +27,7 @@ import dotenv from 'dotenv';
 // import cors from 'cors';
 
 // TODO: Import database connection
-// import connectDB from './config/database.js';
+import connectDB from './config/database.js';
 
 // TODO: Import routes
 // import authRoutes from './routes/authRoutes.js';
@@ -39,6 +39,7 @@ import { errorHandler,notFound } from './middleware/errorMiddleware.js';
 
 // Load environment variables
 dotenv.config();
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
