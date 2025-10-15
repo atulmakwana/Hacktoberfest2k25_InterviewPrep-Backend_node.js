@@ -82,15 +82,51 @@ import User from '../models/User.js';
  */
 
 export const protect = async (req, res, next) => {
-  // TODO: Implement token verification and user authentication
-  console.log('⚠️ Auth middleware not implemented yet!');
-  console.log('👉 Implement this in middleware/authMiddleware.js');
+  let token;
 
-  // Placeholder - remove after implementation
-  return res.status(401).json({
-    success: false,
-    message: 'Authentication not implemented yet',
-  });
+  try {
+    // Extract token from Authorization header
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    // Check if token exists
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized, no token'
+      });
+    }
+
+    // Verify token using JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Find user in database using ID from decoded token
+    const user = await User.findById(decoded.id).select('-password');
+
+    // Check if user exists
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Attach user to request object
+    req.user = user;
+
+    // Call next middleware
+    next();
+  } catch (error) {
+    // Handle token verification errors
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized, invalid token'
+    });
+  }
 };
 
 /**
@@ -126,8 +162,15 @@ export const protect = async (req, res, next) => {
 
 export const authorize = (...roles) => {
   return (req, res, next) => {
-    // TODO: Implement role-based authorization
-    console.log('⚠️ Authorization middleware not implemented yet!');
+    // Check if user's role is included in allowed roles
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to access this route'
+      });
+    }
+
+    // User is authorized, proceed to next middleware
     next();
   };
 };
