@@ -237,33 +237,40 @@ export const getQuestionById = async (req, res, next) => {
 
 export const updateQuestion = async (req, res, next) => {
   try {
-    // TODO: Implement update question
-
     const { id } = req.params;
     const { questionText, topic, difficulty } = req.body;
 
-    // Find question
-    // const question = await Question.findById(id);
+    // Find question by ID
+    const question = await Question.findById(id);
 
-    // Check if exists
-    // if (!question) return 404
+    // Check if question exists
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found'
+      });
+    }
 
-    // Check authorization
-    // if (req.user.role !== 'admin' && question.submittedBy.toString() !== req.user.id) {
-    //   return 403 error
-    // }
+    // Authorization: Check if user is admin OR question owner
+    if (req.user.role !== 'admin' && question.submittedBy.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update this question'
+      });
+    }
 
-    // Update fields
-    // if (questionText) question.questionText = questionText;
-    // if (topic) question.topic = topic;
-    // if (difficulty) question.difficulty = difficulty;
+    // Update fields if they exist in request body
+    if (questionText) question.questionText = questionText;
+    if (topic) question.topic = topic;
+    if (difficulty) question.difficulty = difficulty;
 
-    // Save
-    // const updatedQuestion = await question.save();
+    // Save the updated question
+    const updatedQuestion = await question.save();
 
-    res.status(501).json({
-      success: false,
-      message: 'Update question endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      message: 'Question updated successfully',
+      data: updatedQuestion
     });
   } catch (error) {
     next(error);
