@@ -26,7 +26,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 
 // TODO: Import database connection
-// import connectDB from './config/database.js';
+import connectDB from './config/database.js';
 
 // TODO: Import routes
 // import authRoutes from './routes/authRoutes.js';
@@ -37,6 +37,7 @@ import cors from 'cors';
 
 // Load environment variables
 dotenv.config();
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -89,6 +90,7 @@ app.get('/api/test', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`DB Connection: `)
 });
 
 export default app;
