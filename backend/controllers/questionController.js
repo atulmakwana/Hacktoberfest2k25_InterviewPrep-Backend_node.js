@@ -174,9 +174,7 @@ export const getAllQuestions = async (req, res, next) => {
   }
 };
 
-/**
- * TODO: IMPLEMENT GET QUESTION BY ID
- *
+/*
  * @route   GET /api/questions/:id
  * @desc    Get a single question by ID
  * @access  Public
@@ -191,27 +189,29 @@ export const getAllQuestions = async (req, res, next) => {
 
 export const getQuestionById = async (req, res, next) => {
   try {
-    // TODO: Implement get question by ID
-
     const { id } = req.params;
 
-    // const question = await Question.findById(id).populate('submittedBy', 'name email');
+    // Find question and populate submittedBy
+    const question = await Question.findById(id).populate('submittedBy', 'name'); 
 
-    // if (!question) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: 'Question not found'
-    //   });
-    // }
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found'
+      });
+    }
 
-    res.status(501).json({
-      success: false,
-      message: 'Get question by ID endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      message: 'Question fetched successfully',
+      question
     });
+
   } catch (error) {
     next(error);
   }
 };
+
 
 /**
  * TODO: IMPLEMENT UPDATE QUESTION
@@ -270,42 +270,36 @@ export const updateQuestion = async (req, res, next) => {
   }
 };
 
-/**
- * TODO: IMPLEMENT DELETE QUESTION
- *
+/*
  * @route   DELETE /api/questions/:id
  * @desc    Delete a question (admin or owner only)
  * @access  Private
- *
- * AUTHORIZATION:
- * - Only admin or the user who submitted can delete
- *
- * Steps:
- * 1. Find question by ID
- * 2. Check if exists
- * 3. Check authorization
- * 4. Delete using question.deleteOne() or Question.findByIdAndDelete()
- * 5. Return success message
  */
-
 export const deleteQuestion = async (req, res, next) => {
   try {
-    // TODO: Implement delete question
-
     const { id } = req.params;
 
-    // Find and check authorization
-    // const question = await Question.findById(id);
+    // Find question
+    const question = await Question.findById(id).select('submittedBy');
+    if (!question) {
+      return res.status(404).json({
+         success: false, 
+         message: "Question not found" });
+    }
+
+    // Authorization check using req.user
+    if (!(question.submittedBy.toString() === req.user.id || req.user.role === 'admin')) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Forbidden to delete the question" });
+    }
 
     // Delete
-    // await question.deleteOne();
-    // OR
-    // await Question.findByIdAndDelete(id);
+    await question.deleteOne();
 
-    res.status(501).json({
-      success: false,
-      message: 'Delete question endpoint not implemented yet',
-    });
+    res.status(200).json({ 
+      success: true, 
+      message: "Question deleted" });
   } catch (error) {
     next(error);
   }
@@ -317,78 +311,59 @@ export const deleteQuestion = async (req, res, next) => {
  * @route   POST /api/questions/:id/upvote
  * @desc    Upvote or remove upvote from a question (toggle)
  * @access  Private (authenticated users only)
- *
- * Steps:
- * 1. Find question by ID
- * 2. Check if user already upvoted (check upvotedBy array)
- * 3. If upvoted: remove upvote (toggle off)
- * 4. If not upvoted: add upvote (toggle on)
- * 5. Update upvotes count
- * 6. Save question
- * 7. Return new upvote count
- *
- * HINT: Use the addUpvote instance method from Question model
- *
- * RESPONSE:
- * {
- *   success: true,
- *   message: "Question upvoted" or "Upvote removed",
- *   upvotes: 42
- * }
  */
 
 export const upvoteQuestion = async (req, res, next) => {
   try {
-    // TODO: Implement upvote toggle
-
     const { id } = req.params;
     const userId = req.user.id;
 
-    // Find question
-    // const question = await Question.findById(id);
+    const question = await Question.findById(id);
+    if (!question) {
+      return res.status(404).json({
+         success: false,
+         message: "Question not found" });
+    }
 
-    // Use the addUpvote method from model
-    // await question.addUpvote(userId);
+    // Toggle upvote using model method
+    const upvotedQuestion = await question.addUpvote(userId);
 
-    res.status(501).json({
-      success: false,
-      message: 'Upvote endpoint not implemented yet',
+    // Check if user is now in upvotedBy array
+    const isUserUpvoted = upvotedQuestion.upvotedBy.some(uid => uid.toString() === userId);
+
+    res.status(200).json({
+      success: true,
+      message: isUserUpvoted ? "Question upvoted" : "Upvote removed",
+      upvotes: upvotedQuestion.upvotes
     });
+
   } catch (error) {
     next(error);
   }
 };
 
-/**
- * TODO: IMPLEMENT GET QUESTION UPVOTES
- *
+/*
  * @route   GET /api/questions/:id/upvotes
  * @desc    Get total upvotes for a question
  * @access  Public
- *
- * Steps:
- * 1. Find question by ID
- * 2. Return upvotes count
- *
- * RESPONSE:
- * {
- *   success: true,
- *   upvotes: 42
- * }
  */
 
 export const getQuestionUpvotes = async (req, res, next) => {
   try {
-    // TODO: Implement get upvotes
-
     const { id } = req.params;
 
-    // const question = await Question.findById(id);
-    // if (!question) return 404
+    const question = await Question.findById(id);
+    if(!question){
+      return res.status(404).json({
+        success: false,
+        message: "Question not found"
+      });
+    }
 
-    res.status(501).json({
-      success: false,
-      message: 'Get upvotes endpoint not implemented yet',
+    res.status(200).json({
+      success: true,
+      message: 'Upvotes fetched successfully',
+      upvotes: question.upvotes 
     });
   } catch (error) {
     next(error);
