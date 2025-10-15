@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * SERVER.JS - Main Entry Point for Backend
  *
@@ -23,7 +24,7 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+// import cors from 'cors';
 
 // TODO: Import database connection
 // import connectDB from './config/database.js';
@@ -58,6 +59,15 @@ const PORT = process.env.PORT || 5000;
  * BONUS: Configure CORS to only allow requests from FRONTEND_URL
  */
 
+// Test route - Remove this after implementing proper routes
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API is working!',
+    timestamp: new Date().toISOString()
+  });
+});
+
 /**
  * TODO: MOUNT API ROUTES
  * Mount your route handlers here:
@@ -68,14 +78,6 @@ const PORT = process.env.PORT || 5000;
  * Remember: All routes should be prefixed with /api
  */
 
-// Test route - Remove this after implementing proper routes
-app.get('/api/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'API is working!',
-    timestamp: new Date().toISOString()
-  });
-});
 
 
 //404 Handler - AFTER all routes
@@ -89,6 +91,15 @@ app.use(notFound);
  */
 
 app.use(errorHandler);
+
+
+// ⬇️ TEMPORARY TEST ROUTE - This should NEVER be reached!
+app.get('/api/debug-test', (req, res) => {
+  res.json({ 
+    message: 'THIS SHOULD NOT APPEAR! Error handlers are too early!' 
+  });
+});
+
 
 /**
  * TODO: START SERVER
