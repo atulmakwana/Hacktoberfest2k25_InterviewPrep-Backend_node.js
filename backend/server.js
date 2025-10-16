@@ -30,7 +30,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/database.js';
 
 // TODO: Import routes
-// import authRoutes from './routes/authRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 // import questionRoutes from './routes/questionRoutes.js';
 
 // TODO: Import error middleware
@@ -49,6 +49,7 @@ const PORT = process.env.PORT || 5000;
  * Example: connectDB();
 */
 connectDB();
+app.use(express.json())
 
 /**
  * TODO: SETUP MIDDLEWARE
@@ -79,6 +80,7 @@ app.get('/api/test', (req, res) => {
  * Remember: All routes should be prefixed with /api
  */
 
+app.use('/api/auth', authRoutes)
 
 
 //404 Handler - AFTER all routes
@@ -96,8 +98,8 @@ app.use(errorHandler);
 
 // ⬇️ TEMPORARY TEST ROUTE - This should NEVER be reached!
 app.get('/api/debug-test', (req, res) => {
-  res.json({ 
-    message: 'THIS SHOULD NOT APPEAR! Error handlers are too early!' 
+  res.json({
+    message: 'THIS SHOULD NOT APPEAR! Error handlers are too early!'
   });
 });
 
