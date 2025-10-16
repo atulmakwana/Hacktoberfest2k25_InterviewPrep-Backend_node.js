@@ -65,14 +65,23 @@ export const createQuestion = async (req, res, next) => {
     // Extract required fields from request body
     const { questionText, company, topic, role, difficulty } = req.body;
 
-    // Create question with submittedBy field from authenticated user
+    // Create question with submittedBy field (optional for anonymous)
+    // const question = await Question.create({
+    //   questionText,
+    //   company,
+    //   topic,
+    //   role,
+    //   difficulty,
+    //   submittedBy: req.user ? req.user.id : null
+    // });
+
     const question = await Question.create({
       questionText,
       company,
       topic,
       role,
       difficulty,
-      submittedBy: req.user.id
+      submittedBy: req.user ? req.user.id : null
     });
 
     res.status(201).json({
@@ -80,6 +89,8 @@ export const createQuestion = async (req, res, next) => {
       message: "Question created successfully",
       data: question
     });
+
+
   } catch (error) {
     next(error);
   }
@@ -129,51 +140,76 @@ export const getAllQuestions = async (req, res, next) => {
     // Extract query parameters
     const { company, topic, role, difficulty, sort, fromDate, toDate, page = 1, limit = 10 } = req.query;
 
-    // Build filter object based on query parameters
+    // Build filter object
+
+    // if (company) filter.company = company;
+    // if (topic) filter.topic = topic;
+    // if (role) filter.role = role;
+    // if (difficulty) filter.difficulty = difficulty;
+
+    // Date range filtering
+    // if (fromDate || toDate) {
+    //   filter.createdAt = {};
+    //   if (fromDate) filter.createdAt.$gte = new Date(fromDate);
+    //   if (toDate) filter.createdAt.$lte = new Date(toDate);
+    // }
+
+    // Build sort object
+    // let sortOption = {};
+    // if (sort === 'latest') sortOption = { createdAt: -1 };
+    // else if (sort === 'oldest') sortOption = { createdAt: 1 };
+    // else if (sort === 'upvotes') sortOption = { upvotes: -1 };
+    // else sortOption = { createdAt: -1 }; // default
+
+    // Pagination
+    // const skip = (page - 1) * limit;
+
+    // Execute query
+    // const questions = await Question.find(filter)
+    //   .sort(sortOption)
+    //   .skip(skip)
+    //   .limit(parseInt(limit))
+    //   .populate('submittedBy', 'name');
+
+    // Get total count
+    // const total = await Question.countDocuments(filter);
+
     const filter = {};
     if (company) filter.company = company;
     if (topic) filter.topic = topic;
     if (role) filter.role = role;
     if (difficulty) filter.difficulty = difficulty;
 
-    // Handle date range filtering on createdAt field
     if (fromDate || toDate) {
       filter.createdAt = {};
       if (fromDate) filter.createdAt.$gte = new Date(fromDate);
       if (toDate) filter.createdAt.$lte = new Date(toDate);
     }
 
-    // Build sort object based on sort parameter
     let sortOption = {};
     if (sort === 'latest') sortOption = { createdAt: -1 };
     else if (sort === 'oldest') sortOption = { createdAt: 1 };
     else if (sort === 'upvotes') sortOption = { upvotes: -1 };
-    else sortOption = { createdAt: -1 }; // default to latest
+    else sortOption = { createdAt: -1 };
 
-    // Calculate pagination values
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-    const skip = (pageNum - 1) * limitNum;
+    const skip = (page - 1) * limit;
 
-    // Execute query with filtering, sorting, and pagination
     const questions = await Question.find(filter)
       .sort(sortOption)
-      .skip(skip)
-      .limit(limitNum)
+      .skip(parseInt(skip))
+      .limit(parseInt(limit))
       .populate('submittedBy', 'name');
 
-    // Get total count for pagination metadata
     const total = await Question.countDocuments(filter);
-    const totalPages = Math.ceil(total / limitNum);
 
-    // Return response with pagination metadata
     res.status(200).json({
       success: true,
-      count: total,
-      page: pageNum,
-      pages: totalPages,
+      count: questions.length,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
       data: questions
     });
+
   } catch (error) {
     next(error);
   }
@@ -190,7 +226,7 @@ export const getQuestionById = async (req, res, next) => {
     const { id } = req.params;
 
     // Find question and populate submittedBy
-    const question = await Question.findById(id).populate('submittedBy', 'name'); 
+    const question = await Question.findById(id).populate('submittedBy', 'name');
 
     if (!question) {
       return res.status(404).json({
@@ -265,11 +301,27 @@ export const updateQuestion = async (req, res, next) => {
     // Save the updated question
     const updatedQuestion = await question.save();
 
+
+
+    const question = await Question.findById(id);
+    if (!question) return res.status(404).json({ success: false, message: "Question not found" });
+
+    if (req.user.role !== 'admin' && question.submittedBy.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
+    if (questionText) question.questionText = questionText;
+    if (topic) question.topic = topic;
+    if (difficulty) question.difficulty = difficulty;
+
+    const updatedQuestion = await question.save();
+
     res.status(200).json({
       success: true,
-      message: 'Question updated successfully',
+      message: "Question updated successfully",
       data: updatedQuestion
     });
+
   } catch (error) {
     next(error);
   }
@@ -288,23 +340,26 @@ export const deleteQuestion = async (req, res, next) => {
     const question = await Question.findById(id).select('submittedBy');
     if (!question) {
       return res.status(404).json({
-         success: false, 
-         message: "Question not found" });
+        success: false,
+        message: "Question not found"
+      });
     }
 
     // Authorization check using req.user
     if (!(question.submittedBy.toString() === req.user.id || req.user.role === 'admin')) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Forbidden to delete the question" });
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden to delete the question"
+      });
     }
 
     // Delete
     await question.deleteOne();
 
-    res.status(200).json({ 
-      success: true, 
-      message: "Question deleted" });
+    res.status(200).json({
+      success: true,
+      message: "Question deleted"
+    });
   } catch (error) {
     next(error);
   }
@@ -326,8 +381,9 @@ export const upvoteQuestion = async (req, res, next) => {
     const question = await Question.findById(id);
     if (!question) {
       return res.status(404).json({
-         success: false,
-         message: "Question not found" });
+        success: false,
+        message: "Question not found"
+      });
     }
 
     // Toggle upvote using model method
@@ -358,7 +414,7 @@ export const getQuestionUpvotes = async (req, res, next) => {
     const { id } = req.params;
 
     const question = await Question.findById(id);
-    if(!question){
+    if (!question) {
       return res.status(404).json({
         success: false,
         message: "Question not found"
@@ -368,7 +424,7 @@ export const getQuestionUpvotes = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Upvotes fetched successfully',
-      upvotes: question.upvotes 
+      upvotes: question.upvotes
     });
   } catch (error) {
     next(error);
