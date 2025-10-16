@@ -39,7 +39,6 @@ import { errorHandler,notFound } from './middleware/errorMiddleware.js';
 
 // Load environment variables
 dotenv.config();
-connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,7 +47,8 @@ const PORT = process.env.PORT || 5000;
  * TODO: CONNECT TO DATABASE
  * Call the connectDB function here to establish MongoDB connection
  * Example: connectDB();
- */
+*/
+connectDB();
 
 /**
  * TODO: SETUP MIDDLEWARE
