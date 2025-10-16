@@ -38,75 +38,63 @@
  */
 
 import mongoose from 'mongoose';
-// TODO: Import bcryptjs
-// TODO: Import jsonwebtoken
-
-/**
- * TODO: DEFINE USER SCHEMA
- *
- * Required Fields:
- * - name: String (required, trimmed)
- * - email: String (required, unique, lowercase, trimmed)
- * - password: String (required, min length 6)
- * - role: String (enum: ['user', 'admin'], default: 'user')
- *
- * Schema Options:
- * - timestamps: true (auto-creates createdAt and updatedAt)
- *
- * EXAMPLE:
- * const userSchema = new mongoose.Schema({
- *   fieldName: { type: String, required: true }
- * }, { timestamps: true });
- */
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema(
   {
-    // TODO: Add schema fields here
     name: {
       type: String,
-      // TODO: Add required and trim properties
+      required:true,
+      trim:true,
     },
-    // TODO: Add email field with unique, lowercase, trim
-    // TODO: Add password field with minlength validation
-    // TODO: Add role field with enum and default value
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
   },
   {
-    // TODO: Enable timestamps
+    timestamps: true,
   }
 );
 
-/**
- * TODO: PRE-SAVE MIDDLEWARE FOR PASSWORD HASHING
- *
- * This should run before saving a user document
- * Steps:
- * 1. Check if password is modified using this.isModified('password')
- * 2. If not modified, call next() and return
- * 3. Generate salt using bcrypt.genSalt(10)
- * 4. Hash password using bcrypt.hash(this.password, salt)
- * 5. Set this.password to the hashed password
- * 6. Call next()
- *
- * EXAMPLE:
- * userSchema.pre('save', async function(next) {
- *   if (!this.isModified('password')) return next();
- *   // Hash password logic
- * });
- */
 
-/**
- * TODO: ADD INSTANCE METHOD - comparePassword
- *
- * This method compares a plain text password with the hashed password
- *
- * Parameters: plainPassword (String)
- * Returns: Boolean (true if passwords match, false otherwise)
- *
- * EXAMPLE:
- * userSchema.methods.comparePassword = async function(plainPassword) {
- *   return await bcrypt.compare(plainPassword, this.password);
- * };
- */
+
+
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+
+})
+
+
+userSchema.methods.comparePassword = async function(plainPassword) {
+  return await bcrypt.compare(plainPassword, this.password);
+};
+
 
 /**
  * TODO: ADD INSTANCE METHOD - generateAuthToken
@@ -129,6 +117,11 @@ const userSchema = new mongoose.Schema(
  *   });
  * };
  */
+
+userSchema.methods.generateAuthToken = function() {
+  const payload = { id: this._id, role: this.role };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+}
 
 /**
  * TODO: CREATE AND EXPORT MODEL
