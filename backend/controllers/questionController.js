@@ -293,32 +293,17 @@ export const updateQuestion = async (req, res, next) => {
       });
     }
 
-    // Update fields if they exist in request body
+    // Update fields if provided
     if (questionText) question.questionText = questionText;
     if (topic) question.topic = topic;
     if (difficulty) question.difficulty = difficulty;
 
-    // Save the updated question
-    const updatedQuestion = await question.save();
-
-
-
-    const question = await Question.findById(id);
-    if (!question) return res.status(404).json({ success: false, message: "Question not found" });
-
-    if (req.user.role !== 'admin' && question.submittedBy.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
-    }
-
-    if (questionText) question.questionText = questionText;
-    if (topic) question.topic = topic;
-    if (difficulty) question.difficulty = difficulty;
-
+    // Save and return updated question
     const updatedQuestion = await question.save();
 
     res.status(200).json({
       success: true,
-      message: "Question updated successfully",
+      message: 'Question updated successfully',
       data: updatedQuestion
     });
 
@@ -326,6 +311,7 @@ export const updateQuestion = async (req, res, next) => {
     next(error);
   }
 };
+
 
 /*
  * @route   DELETE /api/questions/:id
