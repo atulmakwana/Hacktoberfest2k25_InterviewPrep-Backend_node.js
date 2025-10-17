@@ -37,11 +37,19 @@ import authRoutes from './routes/authRoutes.js';
 // const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 import { errorHandler,notFound } from './middleware/errorMiddleware.js';
 
+//import rate limiters
+import { generalLimiter, authLimiter, strictLimiter } from "./utils/rateLimiter.js"
+
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+
+app.use('/api/', generalLimiter);
+app.use('/api/auth', authLimiter);
+
 
 /**
  * TODO: CONNECT TO DATABASE
@@ -50,6 +58,7 @@ const PORT = process.env.PORT || 5000;
 */
 connectDB();
 app.use(express.json())
+
 
 /**
  * TODO: SETUP MIDDLEWARE
