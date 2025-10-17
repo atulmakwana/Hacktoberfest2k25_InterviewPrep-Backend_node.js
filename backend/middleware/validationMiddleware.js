@@ -100,64 +100,61 @@ export const validateLogin = [
     .notEmpty().withMessage('Password is required'),
 ];
 
-
-/**
- * TODO: CREATE VALIDATION CHAINS FOR QUESTION CREATION
- *
- * Validate:
- * - questionText: required, trimmed, min 10 characters
- * - company: required, not empty, trimmed
- * - topic: required, not empty, trimmed
- * - role: required, not empty, trimmed
- * - difficulty: required, must be one of: Easy, Medium, Hard
- *
- * EXAMPLE:
- * export const validateCreateQuestion = [
- *   body('questionText')
- *     .trim()
- *     .notEmpty().withMessage('Question text is required')
- *     .isLength({ min: 10 }).withMessage('Question must be at least 10 characters'),
- *   body('difficulty')
- *     .isIn(['Easy', 'Medium', 'Hard']).withMessage('Difficulty must be Easy, Medium, or Hard')
- * ];
+/*
+  validateCreateQuestion - Validation chain for creating a new question
+  Fields:
  */
 
 export const validateCreateQuestion = [
-  // TODO: Implement validation for questionText
-  body('questionText'),
+  body('questionText')
+    .trim()
+    .notEmpty().withMessage('Question text is required')
+    .isLength({ min: 10 }).withMessage('Question must be at least 10 characters'),
 
-  // TODO: Implement validation for company
-  body('company'),
+  body('company')
+    .trim()
+    .notEmpty().withMessage('Company is required'),
 
-  // TODO: Implement validation for topic
-  body('topic'),
+  body('topic')
+    .trim()
+    .notEmpty().withMessage('Topic is required'),
 
-  // TODO: Implement validation for role
-  body('role'),
+  body('role')
+    .trim()
+    .notEmpty().withMessage('Role is required'),
 
-  // TODO: Implement validation for difficulty
-  body('difficulty'),
+  body('difficulty')
+    .notEmpty().withMessage('Difficulty is required')
+    .isIn(['Easy', 'Medium', 'Hard']).withMessage('Difficulty must be Easy, Medium, or Hard'),
 ];
 
-
-/**
- * TODO: CREATE VALIDATION CHAINS FOR QUESTION UPDATE
- *
- * Similar to create, but all fields are optional
- * If provided, they should meet the same criteria
- */
 
 export const validateUpdateQuestion = [
-  // TODO: Implement optional validation for questionText
-  body('questionText').optional(),
+  body('questionText')
+    .optional()
+    .trim()
+    .isLength({ min: 10 }).withMessage('Question must be at least 10 characters'),
 
-  // TODO: Implement optional validation for topic
-  body('topic').optional(),
+  body('company')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Company cannot be empty if provided'),
 
-  // TODO: Implement optional validation for difficulty
-  body('difficulty').optional(),
+  body('topic')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Topic cannot be empty if provided'),
+
+  body('role')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Role cannot be empty if provided'),
+
+  body('difficulty')
+    .optional()
+    .isIn(['Easy', 'Medium', 'Hard']).withMessage('Difficulty must be \'Easy\', \'Medium\', or \'Hard\''),
 ];
-
+  
 
 /**
  * TODO: CREATE VALIDATION FOR MONGODB OBJECTID
