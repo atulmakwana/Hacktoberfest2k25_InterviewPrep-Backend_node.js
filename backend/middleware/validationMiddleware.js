@@ -156,43 +156,32 @@ export const validateUpdateQuestion = [
 ];
   
 
-/**
- * TODO: CREATE VALIDATION FOR MONGODB OBJECTID
- *
- * Validate that route params are valid MongoDB ObjectIds
- *
- * EXAMPLE:
- * export const validateObjectId = [
- *   param('id').isMongoId().withMessage('Invalid question ID')
- * ];
- */
+
 
 export const validateObjectId = [
-  // TODO: Implement ObjectId validation
-  param('id'),
+  param('id')
+    .isMongoId()
+    .withMessage('Invalid ID format'),
 ];
 
-/**
- * TODO: CREATE VALIDATION FOR QUERY PARAMETERS
- *
- * Validate optional query parameters for filtering and search
- *
- * Examples:
- * - sort: must be 'latest', 'oldest', 'upvotes'
- * - difficulty: must be Easy, Medium, or Hard
- * - page, limit: must be positive integers
- */
-
 export const validateQueryParams = [
-  // TODO: Implement validation for sort query
-  query('sort').optional(),
+  query('sort')
+    .optional()
+    .isIn(['latest', 'oldest', 'upvotes'])
+    .withMessage("Sort must be one of: 'latest', 'oldest', 'upvotes'"),
 
-  // TODO: Implement validation for difficulty query
-  query('difficulty').optional(),
+  query('difficulty')
+    .optional()
+    .isIn(['Easy', 'Medium', 'Hard'])
+    .withMessage("Difficulty must be one of: 'Easy', 'Medium', 'Hard'"),
 
-  // TODO: Implement validation for page query
-  query('page').optional(),
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer'),
 
-  // TODO: Implement validation for limit query
-  query('limit').optional(),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max:100})
+    .withMessage('Limit must be a positive integer'),
 ];
