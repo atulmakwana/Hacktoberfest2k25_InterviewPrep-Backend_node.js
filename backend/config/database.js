@@ -49,15 +49,30 @@ import mongoose from 'mongoose';
  */
 
 const connectDB = async () => {
+  // Check for required environment variable
+  if (!process.env.MONGODB_URI) {
+    console.error('MONGODB_URI is not defined in environment variables');
+    process.exit(1);
+  }
   try {
+    // Optional debug logging for development
+    if (process.env.NODE_ENV === 'development') {
+      mongoose.set('debug', true);
+    }
+
     // Connect to MongoDB using Mongoose
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
     // Log successful connection
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    // Log error message and exit process
-    console.error(`❌ Error: ${error.message}`);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } 
+  catch (error) {
+    // Enhanced error logging
+    console.error(`Error: ${error.message}`);
+    console.error(error.stack);
     process.exit(1);
   }
 };
